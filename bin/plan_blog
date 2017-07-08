@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+#bin/pre-commit
+
+echo; echo; echo; echo  "Building incremental deployment plan for blog: ./tfplan_blog"; echo; echo; echo
+set -x
+
+export TF_VAR_env=blog
+export TF_VAR_aws_region=us-east-1
+export TF_VAR_tags="{ maintainer = \"amir.alavi@yahoo.com\", env = \"blog\" }"
+
+cp blog_backend.tf.example backend.tf
+terraform init -no-color
+terraform plan -no-color -out=tfplan_blog
