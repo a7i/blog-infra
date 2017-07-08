@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# terraform fmt
+if [[ $(terraform fmt "-write=false" | wc -l) -ne 0 ]]; then
+  echo "terraform fmt plz:"
+  terraform fmt -write=false
+  exit 1
+fi
+
+set -e
+terraform validate

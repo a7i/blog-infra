@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+echo; echo; echo; echo "Deploying blog using plan: ./tfplan_blog"; echo; echo; echo
+set -x
+
+export TF_VAR_env=blog
+export TF_VAR_aws_region=us-east-1
+export TF_VAR_tags="{ maintainer = \"amir.alavi@yahoo.com\", env = \"blog\" }"
+
+cp blog_backend.tf.example backend.tf
+terraform init -input=false -no-color
+terraform apply -input=false -no-color tfplan_blog
