@@ -16,7 +16,3 @@ variable "maintainer" {
   description = "maintainer of blog resources"
   default     = "amir.alavi@yahoo.com"
 }
-
-variable "branch" {
-  default = "master"
-}

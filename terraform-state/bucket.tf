@@ -5,10 +5,9 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "state" {
-  count    = "${var.production ? 1 : 0}"
-  tags     = "${merge(var.tags, map("Name", "blog-terraform-state"))}"
+  tags     = "${merge(var.tags, map("Name", "${var.env}-tf-state"))}"
   provider = "aws.us-east-1"
-  bucket   = "blog-terraform-state"
+  bucket   = "${var.env}-tf-state"
   acl      = "private"
 
   policy = <<EOF
@@ -21,7 +20,7 @@ resource "aws_s3_bucket" "state" {
             "Effect": "Deny",
             "Principal": "*",
             "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3:::blog-terraform-state/*",
+            "Resource": "arn:aws:s3:::${var.env}-tf-state/*",
             "Condition": {
                 "StringNotEquals": {
                     "s3:x-amz-server-side-encryption": "AES256"
@@ -33,7 +32,7 @@ resource "aws_s3_bucket" "state" {
             "Effect": "Deny",
             "Principal": "*",
             "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3:::blog-terraform-state/*",
+            "Resource": "arn:aws:s3:::${var.env}-tf-state/*",
             "Condition": {
                 "Null": {
                     "s3:x-amz-server-side-encryption": "true"
