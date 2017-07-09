@@ -5,10 +5,9 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "state" {
-  count    = "${var.production ? 1 : 0}"
-  tags     = "${merge(var.tags, map("Name", "blog-terraform-state"))}"
+  tags     = "${merge(var.tags, map("Name", "ltd-terraform-state"))}"
   provider = "aws.us-east-1"
-  bucket   = "blog-terraform-state"
+  bucket   = "ltd-terraform-state"
   acl      = "private"
 
   policy = <<EOF

@@ -17,30 +17,6 @@ resource "aws_internet_gateway" "blog" {
   }
 }
 
-resource "aws_vpc_endpoint" "blog" {
-  vpc_id       = "${aws_vpc.blog.id}"
-  service_name = "com.amazonaws.${var.aws_region}.s3"
-
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Id": "Policy1487718365172",
-    "Statement": [
-        {
-            "Sid": "Stmt1487718362789",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": [
-                "s3:GetObject",
-                "s3:PutObject"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
-}
-
 data "aws_availability_zones" "available" {}
 
 resource "aws_subnet" "public" {
@@ -87,6 +63,17 @@ resource "aws_nat_gateway" "blog" {
   depends_on    = ["aws_internet_gateway.blog"]
 }
 
+resource "aws_subnet" "db" {
+  count             = "${var.az_count}"
+  tags              = "${merge(var.tags, map("Name", "${var.name}-db${count.index}"))}"
+  vpc_id            = "${aws_vpc.blog.id}"
+  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
+  cidr_block        = "10.0.1${count.index}4.0/24"
+
+  lifecycle {
+    ignore_changes = ["tags", "availability_zone"]
+  }
+}
 
 resource "aws_route_table" "nat" {
   tags   = "${merge(var.tags, map("Name", "${var.name}-nat"))}"

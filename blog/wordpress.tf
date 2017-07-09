@@ -1,8 +1,3 @@
-resource "random_id" "db_password" {
-  prefix      = "a"
-  byte_length = 32
-}
-
 resource "tls_private_key" "wordpress" {
   algorithm = "RSA"
 }
@@ -16,13 +11,13 @@ resource "aws_security_group" "wordpress" {
   tags        = "${merge(var.tags, map("Name", "${var.name}-wordpress"))}"
   name        = "${var.name}-wordpress"
   vpc_id      = "${aws_vpc.blog.id}"
-  description = "22 from bastion; all out"
+  description = "22 from all; all out"
 
   ingress {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = ["${aws_security_group.bastion.id}"]
+    security_groups = ["0.0.0.0/0"]
   }
 
   egress {
@@ -100,32 +95,31 @@ data "aws_ami" "wordpress" {
 resource "aws_instance" "wordpress" {
   count         = "1"
   tags          = "${merge(var.tags, map("Name", "${var.name}-wordpress${count.index}"))}"
-  instance_type = "${var.production ? "t2.small" : "t2.small"}"
+  instance_type = "t2.micro"
 
-  ami                    = "${data.aws_ami.wordpress.id}"
+  ami                    = "${lookup(var.wordpress_images, var.aws_region)}"
   vpc_security_group_ids = ["${aws_security_group.wordpress.id}"]
-  subnet_id              = "${element(aws_subnet.backend.*.id, count.index)}"
+  subnet_id              = "${element(aws_subnet.public.*.id, count.index)}"
   key_name               = "${aws_key_pair.wordpress.key_name}"
   iam_instance_profile   = "${aws_iam_instance_profile.wordpress.id}"
 
-  associate_public_ip_address = false
+  associate_public_ip_address = true
   source_dest_check           = false
 
-  depends_on = ["null_resource.deploy_bastion"]
-
   lifecycle {
-    ignore_changes = ["ami"]
+    prevent_destroy = true
+    ignore_changes  = ["ebs_block_device", "tags"]
   }
 
-  root_block_device {
-    volume_size = "30"
+  ebs_block_device {
+    device_name = "/dev/sdg"
+    volume_size = 30
+    volume_type = "st1"
+    encrypted   = true
   }
+}
 
-  user_data = <<EOF
-#!/bin/bash
-sudo yum update -y
-cd /home/ec2-user
-wget https://wordpress.org/latest.tar.gz
-tar -xzf latest.tar.gz
-EOF
+resource "aws_eip" "wordpress" {
+  instance = "${aws_instance.wordpress.id}"
+  vpc      = true
 }

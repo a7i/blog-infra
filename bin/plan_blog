@@ -3,12 +3,12 @@ set -e
 
 #bin/pre-commit
 
-echo; echo; echo; echo  "Building incremental deployment plan for blog: ./tfplan_blog"; echo; echo; echo
+echo; echo; echo; echo  "Building incremental deployment plan for lovetraveldevour: ./tfplan_blog"; echo; echo; echo
 set -x
 
-export TF_VAR_env=blog
+export TF_VAR_env=lovetraveldevour
 export TF_VAR_aws_region=us-east-1
-export TF_VAR_tags="{ maintainer = \"amir.alavi@yahoo.com\", env = \"blog\" }"
+export TF_VAR_tags="{ maintainer = \"amir.alavi@yahoo.com\", env = \"lovetraveldevour\" }"
 
 cp blog_backend.tf.example backend.tf
 terraform init -no-color
