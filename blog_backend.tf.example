@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket  = "terraform-state"
-    key     = "lovetraveldevour"
+    bucket  = "lovetraveldevour-tf-state"
+    key     = "blog"
     region  = "us-east-1"
     encrypt = true
   }
