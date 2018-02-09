@@ -108,7 +108,7 @@ resource "aws_instance" "wordpress" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = ["ebs_block_device", "tags"]
+    ignore_changes  = ["ebs_block_device", "tags", "ami"]
   }
 
   ebs_block_device {

@@ -57,11 +57,11 @@ resource "aws_eip" "nat" {
   vpc = true
 }
 
-resource "aws_nat_gateway" "blog" {
-  allocation_id = "${aws_eip.nat.id}"
-  subnet_id     = "${element(aws_subnet.public.*.id, 0)}"
-  depends_on    = ["aws_internet_gateway.blog"]
-}
+# resource "aws_nat_gateway" "blog" {
+#   allocation_id = "${aws_eip.nat.id}"
+#   subnet_id     = "${element(aws_subnet.public.*.id, 0)}"
+#   depends_on    = ["aws_internet_gateway.blog"]
+# }
 
 resource "aws_subnet" "db" {
   count             = "${var.az_count}"
@@ -75,16 +75,17 @@ resource "aws_subnet" "db" {
   }
 }
 
-resource "aws_route_table" "nat" {
-  tags   = "${merge(var.tags, map("Name", "${var.name}-nat"))}"
-  vpc_id = "${aws_vpc.blog.id}"
+# resource "aws_route_table" "nat" {
+#   tags   = "${merge(var.tags, map("Name", "${var.name}-nat"))}"
+#   vpc_id = "${aws_vpc.blog.id}"
+#
+#   route {
+#     cidr_block     = "0.0.0.0/0"
+#     nat_gateway_id = "${aws_nat_gateway.blog.id}"
+#   }
+#
+#   lifecycle {
+#     ignore_changes = ["tags"]
+#   }
+# }
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = "${aws_nat_gateway.blog.id}"
-  }
-
-  lifecycle {
-    ignore_changes = ["tags"]
-  }
-}
